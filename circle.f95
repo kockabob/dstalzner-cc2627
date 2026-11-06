@@ -6,8 +6,7 @@ PROGRAM circle
         read (*,*) d
         r = d/2
         A = (r**2)*pi
-        write (*,*) "The area is:"
-        write (*,*) A
+        write (*,*) "The area is:", A
         END PROGRAM
 
       
