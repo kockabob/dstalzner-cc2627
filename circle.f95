@@ -7,6 +7,4 @@ PROGRAM circle
         r = d/2
         A = (r**2)*pi
         write (*,*) "The area is:", A
-        END PROGRAM
-
-      
+        END PROGRAM 
