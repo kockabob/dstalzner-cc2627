@@ -5,10 +5,11 @@ PROGRAM verlet
         
         integer, parameter :: wp = SELECTED_REAL_KIND (p=13, r=300)
         
-        integer :: p !particlenumber
+        integer :: p = 0, ncell !particlenumber (row), cellnumber
+
+        character(len=512) :: line
         
-        
-        integer :: i, n, j, pstart, matcol = 12, ios !total steps for docycle, matrix size data
+        integer :: i, n, j, pstart, matcol = 10, ios !total steps for docycle, matrix size data, iostatus
         
         real :: m, s, actualtime, tol
         
@@ -20,36 +21,40 @@ PROGRAM verlet
         F = (/ 0.0, 0.1, 0.0 /)
         pos = (/ 0.0, 0.0, 0.0 /)
         V = (/ 0.0, 0.0, 0.0 /)
-        
-        !read into array "inputmat" to store data in RAM
-        
+    
+        !txt into array
         OPEN(UNIT = 11,  FILE="input.txt", STATUS="old", ACTION="read")
+        
          
-        !counting rows (particles)
+        !counting non-empty rows (particles)
         do
-        read(11, *, iostat=ios)
+        read(11, *, iostat=ios) line
         if (ios /=0) exit
+        if (len_trim(line) == 0) cycle
         p = p + 1
         enddo
-        
         if (p == 0) then
                 print *, "No data found"
         stop
         endif
-
+        print *, p
+        !creating data-matrix same size as input-matrix
         allocate (inputmat(p, matcol))
 
         rewind(11)
+        !allocating values into matrix
 
         do i = 1, p
-        read(11, *, iostat = ios) inputmat(p,:)
+        read(11, *, iostat = ios) inputmat(i,:)
+        print *, inputmat(i,:)
         if (ios /= 0) then
                 print *, "Error reading row", i, ". IOSTAT=", ios
-                stop
+                exit
+        
         endif
         enddo
 
-        close(11)
+        CLOSE(11)
         print *, "Successfully created particledata-matrix. Particle number=", p
 
         !initializing variables
@@ -60,38 +65,40 @@ PROGRAM verlet
 
         ! velocity verlet algorithm
         
-        do pstart = 1, p
-        do i = 1, n
+        !do pstart = 1, p
+        !do i = 1, n
         
-        actualtime = i*s
+        !actualtime = i*s
                 
-                do j = 1, 3 ! 3 x y z vectors
+                !do j = 1, 3 ! 3 x y z vectors
                 !update positions
   
-                pos(j) = pos(j)+s*V(j)+s**2*F(j)/(2*m)
+                !pos(j) = pos(j)+s*V(j)+s**2*F(j)/(2*m)
 
                 !update forces
-                Fnext(j) = F(j)
+                !Fnext(j) = F(j)
 
                 !update velocities
-                V(j) = V(j)+s/(2*m)*(F(j)+Fnext(j))
-                enddo
-                write (*,*) actualtime, "seconds"
+                !V(j) = V(j)+s/(2*m)*(F(j)+Fnext(j))
+                !enddo
+                !write (*,*) actualtime, "seconds"
 
                 !write data in 10s intervals
-                tol = 10
-                if(mod(actualtime, tol) == 0) then
-                        write (*,*) "SpeedXYZ = ", V(1), "m/s, ", V(2), "m/s, ", V(3), "m/s"
-                        write (*,*) "PosXYZ = ", pos(1), "m[x] | ", pos(2), "m[y] |", pos(3), "m[z]"
-                        write (*,*) "time:", actualtime, "s"
-                else
-                endif
+                !tol = 10
+                !if(mod(actualtime, tol) == 0) then
+                !        write (*,*) "SpeedXYZ = ", V(1), "m/s, ", V(2), "m/s, ", V(3), "m/s"
+                !        write (*,*) "PosXYZ = ", pos(1), "m[x] | ", pos(2), "m[y] |", pos(3), "m[z]"
+                !        write (*,*) "time:", actualtime, "s"
+                !else
+                !endif
                  
-        enddo
+        !enddo
 
-        enddo
+        !enddo
         open(unit = 12, file = "output.txt", status="replace", action="write")
-        write(12, *) inputmat
+        do i = 1, p
+        write(12, *) inputmat(i,:)
+        enddo
         close(12)
                 
 END PROGRAM verlet
