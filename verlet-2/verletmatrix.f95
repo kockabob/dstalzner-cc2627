@@ -24,9 +24,9 @@ PROGRAM verlet
          
         !counting non-empty rows (particles)
         do
-        read(11, *, iostat=ios) line
+        read(11, *, iostat=ios) line !read into strings first, to determine empty rows
         if (ios /=0) exit
-        if (len_trim(line) == 0) cycle
+        if (len_trim(line) == 0) cycle !if there is nothing in the line, skip
         p = p + 1
         enddo
         if (p == 0) then
@@ -34,9 +34,11 @@ PROGRAM verlet
         stop
         endif
         print *, p
+
         !creating data-matrix same size as input-matrix
         allocate (inputmat(p, matcol))
-        !creating property-arrays for each particle
+
+        !creating property-arrays where row number is particle number
         allocate (F(p, 3))
         allocate (V(p, 3))
         allocate (pos(p, 3))
@@ -44,9 +46,9 @@ PROGRAM verlet
         allocate (Fnext(p, 3)) 
 
 
-        rewind(11)
-        !allocating values into matrix
+        rewind(11) !start over read process to store into matrix
 
+        !allocating values into matrix
         do i = 1, p
         read(11, *, iostat = ios) inputmat(i,:)
         print *, inputmat(i,:)
@@ -93,9 +95,9 @@ PROGRAM verlet
                         V(l,j) = V(l,j)+s/(2*m(l,1))*(F(l,j)+Fnext(l,j))
                 enddo
 
-                !write (*,*) actualtime, "seconds"
+                !just some output from the process at the beginning and end
                 
-                if (actualtime == 1 .OR. actualtime == n*s) then
+                if (actualtime == s .OR. actualtime == n*s) then
                         write (*,*) "SpeedXYZ = ", V(l,1), "m/s, ", V(l,2), "m/s, ", V(l,3), "m/s"
                         write (*,*) "PosXYZ = ", pos(l,1), "m[x] | ", pos(l,2), "m[y] |", pos(l,3), "m[z]"
                         write (*,*) "time:", actualtime, "s"
@@ -103,13 +105,13 @@ PROGRAM verlet
                 endif    
         enddo
         enddo
-
+        !integrity check for input matrix
         open(unit = 12, file = "iodebug.txt", status="replace", action="write")
         do i = 1, p
         write(12, *) inputmat(i,:)
         enddo
         close(12)
-
+        !calculation results
         open(unit = 13, file = "verletresults.txt", status ="replace", action="write")
         do i = 1, p
         write(13,*) m(i,1), pos(i,1:3), V(i,1:3)
