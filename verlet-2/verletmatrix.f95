@@ -7,7 +7,7 @@ PROGRAM verlet
         
         integer :: p !particlenumber, cellnumber
 
-        integer :: i, nk, j, l, matcol = 7 !total steps (nk) for docycle, matrix size data, iostatus
+        integer :: i, nk, j, l !total steps (nk) for docycle, matrix size data, iostatus
         
         real (kind=wp) :: tau, actualtime !step length (s), + actual time
         
@@ -89,14 +89,6 @@ PROGRAM verlet
                                 V(l,j) = V(l,j)+tau/(2*m(l,1))*(F(l,j)+Fnext(l,j))
                          enddo
 
-                !just some output from the process at the beginning and end
-                
-                        if (actualtime == tau .OR. actualtime == nk*tau) then
-                                write (*,*) "SpeedXYZ = ", V(l,1), "m/s, ", V(l,2), "m/s, ", V(l,3), "m/s"
-                                write (*,*) "PosXYZ = ", x(l,1), "m[x] | ", x(l,2), "m[y] |", x(l,3), "m[z]"
-                                write (*,*) "time:", actualtime, "s"
-                        else
-                        endif    
                 enddo
         enddo
 
