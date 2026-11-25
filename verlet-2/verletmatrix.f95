@@ -11,7 +11,7 @@ PROGRAM verlet
         
         real (kind=wp) :: tau, actualtime !step length (s), + actual time
         
-        real (kind=wp), dimension(:,:), allocatable :: F, V, x, Fnext, m !attribute matrices
+        real (kind=wp), dimension(:,:), allocatable :: F, V, x, Fnext, m ! attribute matrices
         
         real (kind=wp), dimension(:,:), allocatable :: inputmat ! input matrix
         
@@ -72,39 +72,43 @@ PROGRAM verlet
         ! velocity verlet algorithm
 
         do i = 1, nk
-        actualtime = i*tau
+                actualtime = i*tau
 
                 do l = 1, p
                 
-                do j = 1, 3 ! 3 x y z vectors
+                        do j = 1, 3 ! 3 x y z vectors
                         
-                        !update positions
+                                !update positions
                         
-                        x(l,j) = x(l,j)+tau*V(l,j)+tau**2*F(l,j)/(2*m(l,1))
+                                 x(l,j) = x(l,j)+tau*V(l,j)+tau**2*F(l,j)/(2*m(l,1))
 
-                        !update forces
-                        Fnext(l,j) = F(l,j)
+                                !update forces
+                                Fnext(l,j) = F(l,j)
 
-                        !update velocities
-                        V(l,j) = V(l,j)+tau/(2*m(l,1))*(F(l,j)+Fnext(l,j))
-                enddo
+                                !update velocities
+                                V(l,j) = V(l,j)+tau/(2*m(l,1))*(F(l,j)+Fnext(l,j))
+                         enddo
 
                 !just some output from the process at the beginning and end
                 
-                if (actualtime == tau .OR. actualtime == nk*tau) then
-                        write (*,*) "SpeedXYZ = ", V(l,1), "m/s, ", V(l,2), "m/s, ", V(l,3), "m/s"
-                        write (*,*) "PosXYZ = ", x(l,1), "m[x] | ", x(l,2), "m[y] |", x(l,3), "m[z]"
-                        write (*,*) "time:", actualtime, "s"
-                else
-                endif    
-        enddo
+                        if (actualtime == tau .OR. actualtime == nk*tau) then
+                                write (*,*) "SpeedXYZ = ", V(l,1), "m/s, ", V(l,2), "m/s, ", V(l,3), "m/s"
+                                write (*,*) "PosXYZ = ", x(l,1), "m[x] | ", x(l,2), "m[y] |", x(l,3), "m[z]"
+                                write (*,*) "time:", actualtime, "s"
+                        else
+                        endif    
+                enddo
         enddo
 
         !calculation results
         open(unit = 13, file = "verletresults.txt", status ="replace", action="write")
-        do i = 1, p
-        write(13,*) m(i,1), x(i,1:3), V(i,1:3)
-        enddo
+
+                do i = 1, p
+
+                        write(13,*) m(i,1), x(i,1:3), V(i,1:3)
+
+                enddo
+
         close(13)
                 
 END PROGRAM verlet
