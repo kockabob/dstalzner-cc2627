@@ -9,7 +9,7 @@ PROGRAM verlet
 
         integer :: i, nk, j, l !total steps (nk) for docycle, matrix size data, iostatus
         
-        real (kind=wp) :: tau, actualtime !step length (s), + actual time
+        real (kind=wp) :: tau, actualtime, sigma, epsilon !step length (s), + actual time
         
         real (kind=wp), dimension(:,:), allocatable :: F, V, x, Fnext, m ! attribute matrices
         
@@ -19,6 +19,7 @@ PROGRAM verlet
 
                 !allocating values into matrix
                 read(11,*) nk, tau
+                read(11,*) sigma, epsilon
                 read(11,*) p
 
                 !creating property-arrays where row number is particle number
