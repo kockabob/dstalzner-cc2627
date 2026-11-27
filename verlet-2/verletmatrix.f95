@@ -13,8 +13,6 @@ PROGRAM verlet
         
         real (kind=wp), dimension(:,:), allocatable :: F, V, x, Fnext, m ! attribute matrices
         
-        real (kind=wp), dimension(:,:), allocatable :: inputmat ! input matrix
-        
 
         !txt into array
         OPEN(UNIT = 11,  FILE="input.txt", STATUS="old", ACTION="read")
@@ -23,12 +21,18 @@ PROGRAM verlet
                 read(11,*) nk, tau
                 read(11,*) p
 
-                !creating data-matrix same size as input-matrix
-                allocate (inputmat(p, 7))
+                !creating property-arrays where row number is particle number
+                allocate (F(p, 3))
+                allocate (V(p, 3))
+                allocate (x(p, 3))
+                allocate (m(p,1))
+                allocate (Fnext(p, 3)) 
+
+                !initializing properties  for particle p
 
                 do i = 1, p
-                        read(11, *) inputmat(i,:)               
-                
+                        read(11, *) m(i,:), x(i,1:3), V(i,1:3)              
+                        F(i,1:3) = (/0.0, 0.1, 0.0/)
                 enddo
 
         CLOSE(11)
@@ -41,33 +45,16 @@ PROGRAM verlet
                
         
                 do i = 1, p
-                        write(12,*) inputmat(i,:)
+                        write(12,*) m(i,:), x(i,1:3), V(i,1:3)
                 enddo
 
 
         CLOSE(12)
 
-        
-        !creating property-arrays where row number is particle number
-        allocate (F(p, 3))
-        allocate (V(p, 3))
-        allocate (x(p, 3))
-        allocate (m(p,1))
-        allocate (Fnext(p, 3)) 
-
         print *, "Successfully created particledata-matrix. Particle number=", p
 
         ! initializing variables
 
-        !initializing properties  for particle p
-        do i = 1, p
-                m(i,:) = inputmat(i,1)
-                F(i,1:3) = (/0.0, 0.1, 0.0/)
-                x(i,1:3) = inputmat(i,2:4)
-                V(i,1:3) = inputmat(i,5:7)
-        enddo
-
-        deallocate (inputmat)
 
         ! velocity verlet algorithm
 
@@ -97,7 +84,7 @@ PROGRAM verlet
 
                 do i = 1, p
 
-                        write(13,*) m(i,1), x(i,1:3), V(i,1:3)
+                        write(13,'(*(G12.4))') m(i,1), x(i,1:3), V(i,1:3)
 
                 enddo
 
